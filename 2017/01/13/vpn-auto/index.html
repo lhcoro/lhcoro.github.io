@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="实现功能:
+拨入vpn后,如果vpn掉线,将不能访问任何网络,以防暴漏自己真实ip地址
+Windows :
+
+python脚本(检测网卡信息如果没有ppp信息,释放网卡ip地址)123456789101112131415161718192021222324252627282930313233#!#/" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>VPN断线后自动断网脚本 | lhcoro&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="实现功能: 拨入vpn后,如果vpn掉线,将不能访问任何网络,以防暴漏自己真实ip地址 Windows :  python脚本(检测网卡信息如果没有ppp信息,释放网卡ip地址)123456789101112131415161718192021222324252627282930313233#!#/usr/bin/env python#coding=utf-8import msvcrt impor">
+<meta name="keywords" content="匿名,VPN,bash,python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VPN断线后自动断网脚本">
+<meta property="og:url" content="http://3389.in/2017/01/13/vpn-auto/index.html">
+<meta property="og:site_name" content="lhcoro&#39;s blog">
+<meta property="og:description" content="实现功能: 拨入vpn后,如果vpn掉线,将不能访问任何网络,以防暴漏自己真实ip地址 Windows :  python脚本(检测网卡信息如果没有ppp信息,释放网卡ip地址)123456789101112131415161718192021222324252627282930313233#!#/usr/bin/env python#coding=utf-8import msvcrt impor">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-04-19T07:32:40.747Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VPN断线后自动断网脚本">
+<meta name="twitter:description" content="实现功能: 拨入vpn后,如果vpn掉线,将不能访问任何网络,以防暴漏自己真实ip地址 Windows :  python脚本(检测网卡信息如果没有ppp信息,释放网卡ip地址)123456789101112131415161718192021222324252627282930313233#!#/usr/bin/env python#coding=utf-8import msvcrt impor">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <!--<script src='//push.zhanzhang.baidu.com/push.js'></script>-->
+</head>
+
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="lhcoro&#39;s blog" rel="home">lhcoro&#39;s blog</a>
+      </h1>
+      
+        <script type="text/javascript" src="http://api.hitokoto.us/rand?encode=js&charset=utf-8"></script>
+        <h2 class="site-description"><script>hitokoto();</script></h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-vpn-auto" class="post-vpn-auto post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      VPN断线后自动断网脚本
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://3389.in/2017/01/13/vpn-auto/" data-id="cjg6al6kl000f34okqg0yr2h4" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p><strong>实现功能:</strong></p>
+<p>拨入vpn后,如果vpn掉线,将不能访问任何网络,以防暴漏自己真实ip地址</p>
+<p>Windows :</p>
+<ol>
+<li>python脚本(检测网卡信息如果没有ppp信息,释放网卡ip地址)<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!#/usr/bin/env python</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> msvcrt </span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">x=<span class="number">0</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Enter 'q' to exit"</span></span><br><span class="line">vpn=os.popen(<span class="string">"ipconfig |find \"PPP\""</span>).read()</span><br><span class="line"><span class="keyword">if</span> vpn==<span class="string">""</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"No VPN"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    x=<span class="number">1</span></span><br><span class="line"><span class="keyword">while</span> x:</span><br><span class="line">    key=<span class="string">""</span></span><br><span class="line">    time.sleep(<span class="number">0.5</span>)</span><br><span class="line">    <span class="keyword">if</span> msvcrt.kbhit():</span><br><span class="line">        key=msvcrt.getch()</span><br><span class="line">    vpn=os.popen(<span class="string">"ipconfig |find \"PPP\""</span>).read()</span><br><span class="line">    <span class="keyword">if</span>(vpn==<span class="string">""</span>):</span><br><span class="line">        os.popen(<span class="string">"ipconfig /release"</span>).read()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Vpn Disable!!"</span></span><br><span class="line">        opt=raw_input(<span class="string">"Network is Down. Need up?(y/n):"</span>)</span><br><span class="line">        <span class="keyword">if</span> opt==<span class="string">'y'</span>:</span><br><span class="line">            os.popen(<span class="string">"ipconfig /renew"</span>).read()</span><br><span class="line">            <span class="keyword">print</span> <span class="string">"Network is Up!!!"</span></span><br><span class="line">        exit(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"%d check: VPN OK!"</span>%(x)</span><br><span class="line">    x+=<span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> key==<span class="string">"q"</span>:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Exiting..."</span></span><br><span class="line">        exit(<span class="number">1</span>)</span><br><span class="line">        <span class="comment">#os.system("ipconfig /renew")</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>编译后exe程序下载(适用无python环境)</p>
+<ol start="2">
+<li>路由表操作</li>
+</ol>
+<p>拨入vpn或者其他vpn客户端软件后,再本地路由表(route print) 可以看到两个网关信息,一个是本地网关记录,另一个是vpn网关记录<br>需要管理员权限来运行,可以自制bat</p>
+<p>删除本地网关为192.168.1.1的默认路由(只通过vpn网关上网)</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">route delete <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span> <span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>添加本地网关为192.168.1.1的默认路由(恢复网络)<br><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">route add <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span> mask <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span> <span class="number">192</span>.<span class="number">168</span>.<span class="number">1</span>.<span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>Linux(bash脚本)</strong><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">n=1</span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span>;<span class="keyword">do</span></span><br><span class="line">    ifconfig|grep ppp &gt;/dev/null</span><br><span class="line">    <span class="keyword">if</span> [ $? -eq 0 ];</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"<span class="variable">$n</span> Check: VPN OK"</span></span><br><span class="line">        sleep 1</span><br><span class="line">        n=`expr <span class="variable">$n</span> + 1`</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        ifconfig eth0 down</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Network is Down"</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"please run:ifconfig eth0 up"</span></span><br><span class="line">        <span class="built_in">exit</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2017/01/13/vpn-auto/">
+    <time datetime="2017-01-13T14:50:23.000Z" class="entry-date">
+        2017-01-13
+    </time>
+</a>
+    
+  <span class="article-delim">&#8226;</span>
+  <div class="article-category">
+  <a class="article-category-link" href="/categories/Tools/">Tools</a>
+  </div>
+
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/VPN/">VPN</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bash/">bash</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匿名/">匿名</a></li></ul>
+
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+        <span class="nav-previous"><a href="/2017/02/13/remotely-execute-commands/" rel="prev"><span class="meta-nav">←</span> 远程执行命令的几种方法</a></span>
+    
+    
+        <span class="nav-next"><a href="/2016/08/08/linux-hack/" rel="next">Linux跳板实用命令记录 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-content">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Share/">Share</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tools/">Tools</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内网安全/">内网安全</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/社会工程/">社会工程</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/19/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/03/pycharm-license/">pycharm激活(JetBrains IDEA 系列产品通用xx方法(license server))</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/30/iis-6-0-remote-execute/">IIS6.0远程命令执行漏洞(CVE-2017-7269)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/remotely-execute-commands/">远程执行命令的几种方法</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/13/vpn-auto/">VPN断线后自动断网脚本</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/10086/">10086</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/">Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pycharm/">Pycharm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLO/">RLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RTLO/">RTLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPN/">VPN</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WinRaR/">WinRaR</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bash/">bash</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cve-2017-7269/">cve-2017-7269</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fwtmp/">fwtmp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iis6-0/">iis6.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipc/">ipc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/last/">last</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/license/">license</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/psexec/">psexec</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sc/">sc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/schtasks/">schtasks</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shred/">shred</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql注入/">sql注入</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/utmpdump/">utmpdump</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wmic/">wmic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匿名/">匿名</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/命令执行/">命令执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/社会工程学/">社会工程学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/钓鱼/">钓鱼</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/黑色产业/">黑色产业</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/10086/" style="font-size: 10px;">10086</a> <a href="/tags/Oracle/" style="font-size: 10px;">Oracle</a> <a href="/tags/Pycharm/" style="font-size: 10px;">Pycharm</a> <a href="/tags/RLO/" style="font-size: 10px;">RLO</a> <a href="/tags/RTLO/" style="font-size: 10px;">RTLO</a> <a href="/tags/VPN/" style="font-size: 10px;">VPN</a> <a href="/tags/WinRaR/" style="font-size: 10px;">WinRaR</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/bash/" style="font-size: 10px;">bash</a> <a href="/tags/cve-2017-7269/" style="font-size: 10px;">cve-2017-7269</a> <a href="/tags/fwtmp/" style="font-size: 10px;">fwtmp</a> <a href="/tags/iis6-0/" style="font-size: 10px;">iis6.0</a> <a href="/tags/ipc/" style="font-size: 10px;">ipc</a> <a href="/tags/last/" style="font-size: 10px;">last</a> <a href="/tags/license/" style="font-size: 10px;">license</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/psexec/" style="font-size: 10px;">psexec</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sc/" style="font-size: 10px;">sc</a> <a href="/tags/schtasks/" style="font-size: 10px;">schtasks</a> <a href="/tags/shred/" style="font-size: 10px;">shred</a> <a href="/tags/sql注入/" style="font-size: 10px;">sql注入</a> <a href="/tags/utmpdump/" style="font-size: 10px;">utmpdump</a> <a href="/tags/wmic/" style="font-size: 10px;">wmic</a> <a href="/tags/匿名/" style="font-size: 20px;">匿名</a> <a href="/tags/命令执行/" style="font-size: 10px;">命令执行</a> <a href="/tags/社会工程学/" style="font-size: 10px;">社会工程学</a> <a href="/tags/钓鱼/" style="font-size: 10px;">钓鱼</a> <a href="/tags/黑色产业/" style="font-size: 10px;">黑色产业</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 lhcoro
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>

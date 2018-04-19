@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="上篇文章Linux下入侵匿迹隐藏的方法,是一些大牛的思路和操作命令,下面有些是已经重复的,主要是做个记录,把常用的命令都整理下
+登录后执行下面命令,不记录历史命令(.bash_history)
+1unset HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG; export HISTFILE=/dev/null; export HISTSIZE=0; export HISTFILESIZE=0
+last命令结果修改ip(如果修改用户什么的,自己修改下把)Centos1utmpdump /var/log/wtmp |sed &#34;s/8.8.8.8/1.1.1.1/g&#34; |utmpdump -r &amp;gt;/tmp/wtmp1 &amp;amp;&amp;amp;\mv  /tmp/wtmp1 /var/log/wtmp
+lastlog 修改替换1sed -i &#39;s/192.168.1.1/8.8.8.8/&#39; /var/log/lastlog" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>Linux跳板实用命令记录 | lhcoro&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="上篇文章Linux下入侵匿迹隐藏的方法,是一些大牛的思路和操作命令,下面有些是已经重复的,主要是做个记录,把常用的命令都整理下 登录后执行下面命令,不记录历史命令(.bash_history) 1unset HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG; export HISTFILE=/dev/null; export HISTSIZE=0">
+<meta name="keywords" content="last,shred,utmpdump,fwtmp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux跳板实用命令记录">
+<meta property="og:url" content="http://3389.in/2016/08/08/linux-hack/index.html">
+<meta property="og:site_name" content="lhcoro&#39;s blog">
+<meta property="og:description" content="上篇文章Linux下入侵匿迹隐藏的方法,是一些大牛的思路和操作命令,下面有些是已经重复的,主要是做个记录,把常用的命令都整理下 登录后执行下面命令,不记录历史命令(.bash_history) 1unset HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG; export HISTFILE=/dev/null; export HISTSIZE=0">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-04-19T07:32:40.745Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux跳板实用命令记录">
+<meta name="twitter:description" content="上篇文章Linux下入侵匿迹隐藏的方法,是一些大牛的思路和操作命令,下面有些是已经重复的,主要是做个记录,把常用的命令都整理下 登录后执行下面命令,不记录历史命令(.bash_history) 1unset HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG; export HISTFILE=/dev/null; export HISTSIZE=0">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <!--<script src='//push.zhanzhang.baidu.com/push.js'></script>-->
+</head>
+
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="lhcoro&#39;s blog" rel="home">lhcoro&#39;s blog</a>
+      </h1>
+      
+        <script type="text/javascript" src="http://api.hitokoto.us/rand?encode=js&charset=utf-8"></script>
+        <h2 class="site-description"><script>hitokoto();</script></h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-linux-hack" class="post-linux-hack post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      Linux跳板实用命令记录
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://3389.in/2016/08/08/linux-hack/" data-id="cjg6al6kb000634okp3qc3rqm" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>上篇文章Linux下入侵匿迹隐藏的方法,是一些大牛的思路和操作命令,下面有些是已经重复的,主要是做个记录,把常用的命令都整理下</p>
+<p>登录后执行下面命令,不记录历史命令(.bash_history)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unset</span> HISTORY HISTFILE HISTSAVE HISTZONE HISTORY HISTLOG; <span class="built_in">export</span> HISTFILE=/dev/null; <span class="built_in">export</span> HISTSIZE=0; <span class="built_in">export</span> HISTFILESIZE=0</span><br></pre></td></tr></table></figure>
+<p>last命令结果修改ip(如果修改用户什么的,自己修改下把)<br>Centos<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">utmpdump /var/<span class="built_in">log</span>/wtmp |sed <span class="string">"s/8.8.8.8/1.1.1.1/g"</span> |utmpdump -r &gt;/tmp/wtmp1 &amp;&amp;\mv  /tmp/wtmp1 /var/<span class="built_in">log</span>/wtmp</span><br></pre></td></tr></table></figure></p>
+<p>lastlog 修改替换<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">'s/192.168.1.1/8.8.8.8/'</span> /var/<span class="built_in">log</span>/lastlog</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>不记录ssh公钥在本地.ssh目录中<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -o UserKnownHostsFile=/dev/null -T user@host /bin/bash –i</span><br></pre></td></tr></table></figure></p>
+<p>多次覆盖文件，使得即使是昂贵的硬件探测仪器也难以将数据复原 -n, –iterations=N 覆盖N 次，而非使用默认的3 次。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shred -n 31337 -z -u filename</span><br></pre></td></tr></table></figure></p>
+<p>-n, –iterations=N 覆盖N 次，而非使用默认的3 次<br>-z, –zero 最后一次使用0 进行覆盖以隐藏覆盖动作<br>-u, –remove 覆盖后截断并删除文件</p>
+<p>登录账户 w下管理员是看不到的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T somebody@8.8.8.8 /bin/bash –i</span><br></pre></td></tr></table></figure></p>
+<p>日志文件<br>/var/log/message 系统启动后的信息和错误日志，是Red Hat Linux中最常用的日志之一<br>/var/log/secure 与安全相关的日志信息<br>/var/log/maillog 与邮件相关的日志信息<br>/var/log/cron 与定时任务相关的日志信息<br>/var/log/spooler 与UUCP和news设备相关的日志信息<br>/var/log/boot.log 守护进程启动和停止相关的日志消息<br>/var/log/btmp – 记录所有失败登录信息 命令:lastb<br>/var/log/auth.log 系统授权信息，包括用户登录和使用的权限机制等 (debian)</p>
+<p>删除部分日志,比如以当天日期或者自己的登录ip<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed  -i <span class="string">'/当前时间/'</span>d  /var/<span class="built_in">log</span>/messages</span><br></pre></td></tr></table></figure></p>
+<p>本来想自动提取当前时间,感觉麻烦,还是自己手动修改时间或者ip把,适用性也会 好点把</p>
+<p>个人建议登录linux,使用winscp工具连接,选择sftp协议,执行命令或者操作目录文件,在history,lastlog,last,w下不会有记录,<br>但是在/var/log/secure会有sftp连接记录,只需要清理登录日志就可以了</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2016/08/08/linux-hack/">
+    <time datetime="2016-08-08T00:19:47.000Z" class="entry-date">
+        2016-08-08
+    </time>
+</a>
+    
+  <span class="article-delim">&#8226;</span>
+  <div class="article-category">
+  <a class="article-category-link" href="/categories/Share/">Share</a>
+  </div>
+
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fwtmp/">fwtmp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/last/">last</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shred/">shred</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/utmpdump/">utmpdump</a></li></ul>
+
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+        <span class="nav-previous"><a href="/2017/01/13/vpn-auto/" rel="prev"><span class="meta-nav">←</span> VPN断线后自动断网脚本</a></span>
+    
+    
+        <span class="nav-next"><a href="/2016/07/28/linux-anmos/" rel="next">Linux下入侵匿迹隐藏的方法 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-content">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Share/">Share</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tools/">Tools</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内网安全/">内网安全</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/社会工程/">社会工程</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/19/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/03/pycharm-license/">pycharm激活(JetBrains IDEA 系列产品通用xx方法(license server))</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/30/iis-6-0-remote-execute/">IIS6.0远程命令执行漏洞(CVE-2017-7269)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/remotely-execute-commands/">远程执行命令的几种方法</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/13/vpn-auto/">VPN断线后自动断网脚本</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/10086/">10086</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/">Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pycharm/">Pycharm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RLO/">RLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RTLO/">RTLO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPN/">VPN</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WinRaR/">WinRaR</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bash/">bash</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cve-2017-7269/">cve-2017-7269</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fwtmp/">fwtmp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iis6-0/">iis6.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipc/">ipc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/last/">last</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/license/">license</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/psexec/">psexec</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sc/">sc</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/schtasks/">schtasks</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shred/">shred</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql注入/">sql注入</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/utmpdump/">utmpdump</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wmic/">wmic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匿名/">匿名</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/命令执行/">命令执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/社会工程学/">社会工程学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/钓鱼/">钓鱼</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/黑色产业/">黑色产业</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/10086/" style="font-size: 10px;">10086</a> <a href="/tags/Oracle/" style="font-size: 10px;">Oracle</a> <a href="/tags/Pycharm/" style="font-size: 10px;">Pycharm</a> <a href="/tags/RLO/" style="font-size: 10px;">RLO</a> <a href="/tags/RTLO/" style="font-size: 10px;">RTLO</a> <a href="/tags/VPN/" style="font-size: 10px;">VPN</a> <a href="/tags/WinRaR/" style="font-size: 10px;">WinRaR</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/bash/" style="font-size: 10px;">bash</a> <a href="/tags/cve-2017-7269/" style="font-size: 10px;">cve-2017-7269</a> <a href="/tags/fwtmp/" style="font-size: 10px;">fwtmp</a> <a href="/tags/iis6-0/" style="font-size: 10px;">iis6.0</a> <a href="/tags/ipc/" style="font-size: 10px;">ipc</a> <a href="/tags/last/" style="font-size: 10px;">last</a> <a href="/tags/license/" style="font-size: 10px;">license</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/psexec/" style="font-size: 10px;">psexec</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sc/" style="font-size: 10px;">sc</a> <a href="/tags/schtasks/" style="font-size: 10px;">schtasks</a> <a href="/tags/shred/" style="font-size: 10px;">shred</a> <a href="/tags/sql注入/" style="font-size: 10px;">sql注入</a> <a href="/tags/utmpdump/" style="font-size: 10px;">utmpdump</a> <a href="/tags/wmic/" style="font-size: 10px;">wmic</a> <a href="/tags/匿名/" style="font-size: 20px;">匿名</a> <a href="/tags/命令执行/" style="font-size: 10px;">命令执行</a> <a href="/tags/社会工程学/" style="font-size: 10px;">社会工程学</a> <a href="/tags/钓鱼/" style="font-size: 10px;">钓鱼</a> <a href="/tags/黑色产业/" style="font-size: 10px;">黑色产业</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 lhcoro
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>
